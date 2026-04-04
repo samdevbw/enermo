@@ -91,6 +91,3 @@ enermo/
 ├── tsconfig.json
 └── package.json
 ```
-```bash
-npm run dev
-```

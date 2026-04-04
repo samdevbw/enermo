@@ -91,23 +91,6 @@ enermo/
 ├── tsconfig.json
 └── package.json
 ```
-
-## Setup
-
-1. Clone the repo and install:
-```bash
-npm install
-```
-
-2. Copy `.env.example` to `.env.local` and fill in Supabase credentials:
-```
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-3. Run SQL schema in Supabase SQL editor (see `schema.sql`)
-
-4. Start dev server:
 ```bash
 npm run dev
 ```

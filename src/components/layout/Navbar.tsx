@@ -23,10 +23,17 @@ export function Navbar() {
     return '/dashboard'
   }
 
-  async function handleSignOut() {
+async function handleSignOut() {
+  try {
+    setUserMenuOpen(false)
+    setMobileOpen(false)
+
     await signOut()
-    navigate('/')
+    navigate('/', { replace: true })
+  } catch (error) {
+    console.error('Failed to sign out:', error)
   }
+}
 
   return (
     <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">

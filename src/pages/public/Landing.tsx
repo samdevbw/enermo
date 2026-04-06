@@ -4,7 +4,7 @@ import {
   ArrowRight, CheckCircle2, Star, ShieldCheck,
 } from 'lucide-react'
 import { Button } from '@/components/ui'
-import { SAMPLE_VENDORS, SAMPLE_PRODUCTS, SAMPLE_CATEGORIES } from '@/data/sampleData'
+import { useProducts, useVendors, useCategories } from '@/hooks/useProducts'
 import { ProductCard } from '@/components/products/ProductCard'
 import { VendorCard } from '@/components/vendors/VendorCard'
 
@@ -34,6 +34,10 @@ const WHY_ITEMS = [
 ]
 
 export function Landing() {
+  const { data: categories = [] } = useCategories()
+  const { data: products = [] } = useProducts()
+  const { data: vendors = [] } = useVendors()
+
   return (
     <div className="font-body">
       {/* ---- Hero ---- */}
@@ -101,7 +105,7 @@ export function Landing() {
             <p className="text-gray-500">Find exactly what your energy needs require</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
-            {SAMPLE_CATEGORIES.map((cat) => (
+            {categories.map((cat) => (
               <Link
                 key={cat.id}
                 to={`/marketplace?category=${cat.id}`}
@@ -130,7 +134,7 @@ export function Landing() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {SAMPLE_PRODUCTS.slice(0, 3).map((p) => (
+            {products.slice(0, 3).map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
@@ -200,7 +204,7 @@ export function Landing() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {SAMPLE_VENDORS.slice(0, 3).map((v) => (
+            {vendors.slice(0, 3).map((v) => (
               <VendorCard key={v.id} vendor={v} />
             ))}
           </div>

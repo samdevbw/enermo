@@ -6,6 +6,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  fetchCategories,
 } from '@/services/products'
 import {
   fetchVendors,
@@ -19,6 +20,16 @@ import {
   updateOrderStatus,
 } from '@/services/vendors'
 import type { FilterState, ProductFormData, InquiryFormData, OrderFormData } from '@/types'
+
+// ---- Categories ----
+
+export function useCategories() {
+  return useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+    staleTime: Infinity,
+  })
+}
 
 // ---- Products ----
 

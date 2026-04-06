@@ -111,7 +111,7 @@ export function SignUp() {
 
   const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<SignUpForm>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { role: defaultRole },
+    defaultValues: { role: defaultRole as "customer" | "vendor"},
   })
 
   const selectedRole = watch('role')

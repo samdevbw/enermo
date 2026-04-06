@@ -8,9 +8,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAuth } from '@/hooks/useAuth'
-import { useSubmitInquiry } from '@/hooks/useProducts'
-import { Button, Badge, Modal, Input, Spinner, EmptyState } from '@/components/ui'
-import { SAMPLE_PRODUCTS } from '@/data/sampleData'
+import { useProduct, useSubmitInquiry } from '@/hooks/useProducts'
+import { Button, Modal, Input, Spinner, EmptyState } from '@/components/ui'
 import type { InquiryFormData } from '@/types'
 
 const inquirySchema = z.object({
@@ -25,18 +24,11 @@ export function ProductDetail() {
   const { user, profile } = useAuth()
   const [inquiryOpen, setInquiryOpen] = useState(false)
   const [inquiryDone, setInquiryDone] = useState(false)
+
+  const { data: product, isLoading, isError } = useProduct(slug!)
   const submitInquiry = useSubmitInquiry()
 
-  // Use sample data; swap with: const { data: product, isLoading } = useProduct(slug!)
-  const product = SAMPLE_PRODUCTS.find((p) => p.slug === slug)
-  const isLoading = false
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<InquiryFormData>({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<InquiryFormData>({
     resolver: zodResolver(inquirySchema),
     defaultValues: {
       customer_name: profile?.full_name ?? '',
@@ -45,7 +37,7 @@ export function ProductDetail() {
   })
 
   if (isLoading) return <Spinner />
-  if (!product) {
+  if (isError || !product) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16">
         <EmptyState
@@ -78,7 +70,6 @@ export function ProductDetail() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Breadcrumb */}
       <Link
         to="/marketplace"
         className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary-600 mb-6 transition-colors"
@@ -114,15 +105,12 @@ export function ProductDetail() {
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             {product.title}
           </h1>
-
-          {/* Brand & model */}
           {(product.brand || product.model) && (
             <p className="text-sm text-gray-500 mb-4">
               {[product.brand, product.model].filter(Boolean).join(' · ')}
             </p>
           )}
 
-          {/* Price */}
           <div className="mb-5">
             <p className="font-display text-3xl font-bold text-gray-900">
               {formatPrice(product.price, product.currency)}
@@ -132,7 +120,6 @@ export function ProductDetail() {
             )}
           </div>
 
-          {/* Quick specs */}
           <div className="grid grid-cols-2 gap-3 mb-5">
             {product.capacity && (
               <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
@@ -156,13 +143,8 @@ export function ProductDetail() {
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3 mb-6">
-            <Button
-              size="lg"
-              className="flex-1"
-              onClick={() => setInquiryOpen(true)}
-            >
+            <Button size="lg" className="flex-1" onClick={() => setInquiryOpen(true)}>
               <MessageSquare size={18} />
               Send Inquiry
             </Button>
@@ -174,7 +156,6 @@ export function ProductDetail() {
             )}
           </div>
 
-          {/* Vendor card */}
           {product.vendor && (
             <Link
               to={`/vendors/${product.vendor.id}`}
@@ -208,7 +189,6 @@ export function ProductDetail() {
             </Link>
           )}
 
-          {/* Description */}
           {product.description && (
             <div className="mb-6">
               <h2 className="font-semibold text-gray-900 mb-2">Description</h2>
@@ -216,7 +196,6 @@ export function ProductDetail() {
             </div>
           )}
 
-          {/* Features */}
           {product.features && product.features.length > 0 && (
             <div>
               <h2 className="font-semibold text-gray-900 mb-3">What's Included</h2>
@@ -233,7 +212,6 @@ export function ProductDetail() {
         </div>
       </div>
 
-      {/* Inquiry modal */}
       <Modal open={inquiryOpen} onClose={() => { setInquiryOpen(false); setInquiryDone(false) }} title="Send an Inquiry">
         {inquiryDone ? (
           <div className="text-center py-6">
@@ -242,51 +220,27 @@ export function ProductDetail() {
             <p className="text-sm text-gray-500 mb-4">
               {product.vendor?.business_name} will get back to you shortly.
             </p>
-            <Button onClick={() => { setInquiryOpen(false); setInquiryDone(false) }}>
-              Done
-            </Button>
+            <Button onClick={() => { setInquiryOpen(false); setInquiryDone(false) }}>Done</Button>
           </div>
         ) : (
           <form onSubmit={handleSubmit(onInquirySubmit)} className="space-y-4">
             <p className="text-sm text-gray-500 -mt-2 mb-1">
               Inquiring about: <strong className="text-gray-700">{product.title}</strong>
             </p>
-            <Input
-              label="Your Name *"
-              error={errors.customer_name?.message}
-              {...register('customer_name')}
-            />
-            <Input
-              label="Email *"
-              type="email"
-              error={errors.customer_email?.message}
-              {...register('customer_email')}
-            />
-            <Input
-              label="Phone (optional)"
-              type="tel"
-              placeholder="+267 7..."
-              {...register('customer_phone')}
-            />
+            <Input label="Your Name *" error={errors.customer_name?.message} {...register('customer_name')} />
+            <Input label="Email *" type="email" error={errors.customer_email?.message} {...register('customer_email')} />
+            <Input label="Phone (optional)" type="tel" placeholder="+267 7..." {...register('customer_phone')} />
             <div className="space-y-1">
               <label className="block text-sm font-medium text-gray-700">Message *</label>
               <textarea
                 rows={4}
                 placeholder="I'm interested in this product. Can you provide more information about installation, delivery, and pricing?"
-                className={`w-full px-3 py-2 border rounded-lg text-sm resize-y focus:outline-none focus:ring-2 focus:ring-primary-400 ${
-                  errors.message ? 'border-red-400' : 'border-gray-300'
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg text-sm resize-y focus:outline-none focus:ring-2 focus:ring-primary-400 ${errors.message ? 'border-red-400' : 'border-gray-300'}`}
                 {...register('message')}
               />
               {errors.message && <p className="text-xs text-red-600">{errors.message.message}</p>}
             </div>
-            <Button
-              type="submit"
-              fullWidth
-              loading={submitInquiry.isPending}
-            >
-              Send Inquiry
-            </Button>
+            <Button type="submit" fullWidth loading={submitInquiry.isPending}>Send Inquiry</Button>
           </form>
         )}
       </Modal>

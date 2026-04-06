@@ -89,11 +89,16 @@ export async function submitInquiry(
 
   if (error) throw error
 
-  // Increment inquiry count
-  supabase
-    .from('products')
-    .rpc('increment', { row_id: productId, table_name: 'products', column_name: 'inquiry_count' })
-    .then(() => {})
+  // ✅ Fixed: Call rpc on supabase client, not on .from()
+ supabase
+  .rpc('increment', { 
+    row_id: productId, 
+    table_name: 'products', 
+    column_name: 'inquiry_count' 
+  })
+  .then(({ error }) => {
+    if (error) console.error('Failed to increment inquiry count:', error)
+  })
 
   return data as Inquiry
 }

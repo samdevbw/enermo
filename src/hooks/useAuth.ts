@@ -79,10 +79,17 @@ export function useAuthProvider(): AuthContextType {
     if (error) throw error
   }
 
-  async function signOut() {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
+const signOut = async () => {
+  const { error } = await supabase.auth.signOut()
+
+  if (error) {
+    console.error('Sign out error:', error.message)
+    throw error
   }
+  setUser(null)
+  setSession(null)
+  setProfile(null)
+}
 
   return { user, session, profile, loading, signIn, signUp, signOut }
 }

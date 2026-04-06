@@ -15,9 +15,14 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+<<<<<<< HEAD
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
+=======
+       "paths": {
+      "@/*": ["./src/*"]         
+>>>>>>> f43adbf (Initial commit - Not first - Enermo project)
     }
   },
   "include": ["src"],

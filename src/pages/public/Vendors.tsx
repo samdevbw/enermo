@@ -1,17 +1,12 @@
-// ============================================================
-// Vendors listing page
-// ============================================================
 import { Link, useParams } from 'react-router-dom'
 import { MapPin, Star, ShieldCheck, Globe, Phone, Mail, ArrowLeft } from 'lucide-react'
 import { VendorCard } from '@/components/vendors/VendorCard'
 import { ProductCard } from '@/components/products/ProductCard'
 import { Spinner, EmptyState, Badge } from '@/components/ui'
-import { SAMPLE_VENDORS, SAMPLE_PRODUCTS } from '@/data/sampleData'
+import { useVendors, useVendor, useVendorProducts } from '@/hooks/useProducts'
 
 export function Vendors() {
-  // const { data: vendors, isLoading } = useVendors()
-  const vendors = SAMPLE_VENDORS
-  const isLoading = false
+  const { data: vendors = [], isLoading } = useVendors()
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -29,11 +24,7 @@ export function Vendors() {
       {!isLoading && vendors.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {vendors.map((v) => (
-            <VendorCard
-              key={v.id}
-              vendor={v}
-              productCount={SAMPLE_PRODUCTS.filter((p) => p.vendor_id === v.id).length}
-            />
+            <VendorCard key={v.id} vendor={v} />
           ))}
         </div>
       )}
@@ -41,16 +32,13 @@ export function Vendors() {
   )
 }
 
-// ============================================================
-// Vendor profile page
-// ============================================================
 export function VendorProfile() {
   const { id } = useParams<{ id: string }>()
 
-  // const { data: vendor, isLoading } = useVendor(id)
-  const vendor = SAMPLE_VENDORS.find((v) => v.id === id)
-  const products = SAMPLE_PRODUCTS.filter((p) => p.vendor_id === id)
-  const isLoading = false
+  const { data: vendor, isLoading: vendorLoading } = useVendor(id)
+  const { data: products = [], isLoading: productsLoading } = useVendorProducts(id)
+
+  const isLoading = vendorLoading || productsLoading
 
   if (isLoading) return <Spinner />
   if (!vendor) {
@@ -74,7 +62,6 @@ export function VendorProfile() {
         All Vendors
       </Link>
 
-      {/* Cover */}
       <div className="relative h-40 sm:h-56 rounded-2xl overflow-hidden bg-gradient-to-br from-forest-700 to-forest-950 mb-6">
         {vendor.cover_url && (
           <img src={vendor.cover_url} alt="" className="w-full h-full object-cover opacity-40" />
@@ -87,7 +74,6 @@ export function VendorProfile() {
         )}
       </div>
 
-      {/* Profile header */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
         <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white border-4 border-white shadow-md overflow-hidden shrink-0 -mt-12 sm:-mt-16 ml-4">
           {vendor.logo_url ? (
@@ -104,7 +90,6 @@ export function VendorProfile() {
             <h1 className="font-display text-2xl font-bold text-gray-900">{vendor.business_name}</h1>
             {vendor.verified && <Badge variant="green">Verified</Badge>}
           </div>
-
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 mb-3">
             <span className="flex items-center gap-1">
               <MapPin size={13} />
@@ -117,7 +102,6 @@ export function VendorProfile() {
               </span>
             )}
           </div>
-
           <div className="flex flex-wrap gap-3 text-sm text-gray-600">
             {vendor.email && (
               <a href={`mailto:${vendor.email}`} className="flex items-center gap-1.5 hover:text-primary-600">
@@ -144,7 +128,6 @@ export function VendorProfile() {
         </div>
       )}
 
-      {/* Products */}
       <div>
         <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
           Products ({products.length})

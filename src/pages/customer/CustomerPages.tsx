@@ -1,6 +1,3 @@
-// ============================================================
-// Customer Dashboard
-// ============================================================
 import { Link } from 'react-router-dom'
 import { ShoppingCart, Package, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -9,13 +6,9 @@ import { Card, StatCard, Badge, EmptyState, Spinner, Button } from '@/components
 
 export function CustomerDashboard() {
   const { user, profile } = useAuth()
-  // const { data: orders, isLoading } = useCustomerOrders(user?.id)
+  const { data: orders = [], isLoading } = useCustomerOrders(user?.id)
 
-  // Demo
-  const orders = [
-    { id: 'o1', order_number: 'ORD-20240320-ab1234', status: 'confirmed' as const, total_amount: 28500, currency: 'BWP', created_at: '2024-03-20', product: { title: 'SunTech Home 3kW Solar System' }, vendor: { business_name: 'SunTech Botswana' } },
-  ]
-  const isLoading = false
+  const activeOrders = orders.filter((o) => !['delivered', 'cancelled'].includes(o.status)).length
 
   const statusBadge = (s: string) => {
     const map: Record<string, 'green' | 'yellow' | 'red' | 'blue' | 'gray'> = {
@@ -24,28 +17,20 @@ export function CustomerDashboard() {
     return <Badge variant={map[s] ?? 'gray'}>{s}</Badge>
   }
 
+  if (isLoading) return <Spinner />
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-gray-900">
-          My Account
-        </h1>
-        <p className="text-gray-500 text-sm mt-1">Welcome back, {profile?.full_name?.split(' ')[0] ?? 'there'}</p>
+        <h1 className="font-display text-2xl font-bold text-gray-900">My Account</h1>
+        <p className="text-gray-500 text-sm mt-1">
+          Welcome back, {profile?.full_name?.split(' ')[0] ?? 'there'}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <StatCard
-          label="Total Orders"
-          value={orders.length}
-          icon={<ShoppingCart size={20} />}
-          color="yellow"
-        />
-        <StatCard
-          label="Active Orders"
-          value={orders.filter((o) => !['delivered', 'cancelled'].includes(o.status)).length}
-          icon={<Package size={20} />}
-          color="blue"
-        />
+        <StatCard label="Total Orders" value={orders.length} icon={<ShoppingCart size={20} />} color="yellow" />
+        <StatCard label="Active Orders" value={activeOrders} icon={<Package size={20} />} color="blue" />
       </div>
 
       <Card>
@@ -56,23 +41,21 @@ export function CustomerDashboard() {
           </Link>
         </div>
 
-        {isLoading && <div className="text-sm text-gray-400">Loading...</div>}
-
-        {!isLoading && orders.length === 0 && (
+        {orders.length === 0 ? (
           <EmptyState
             title="No orders yet"
             description="Browse the marketplace to find clean energy products."
             action={<Link to="/marketplace"><Button variant="outline" size="sm">Browse Products</Button></Link>}
           />
-        )}
-
-        {!isLoading && orders.length > 0 && (
+        ) : (
           <div className="space-y-3">
-            {orders.map((o) => (
+            {orders.slice(0, 5).map((o) => (
               <div key={o.id} className="flex items-start justify-between gap-3 py-2 border-b border-gray-50 last:border-0">
                 <div>
                   <p className="font-medium text-sm text-gray-900">{o.product?.title}</p>
-                  <p className="text-xs text-gray-400">{o.vendor?.business_name} · {o.order_number}</p>
+                  <p className="text-xs text-gray-400">
+                    {o.vendor?.business_name} · {o.order_number}
+                  </p>
                 </div>
                 <div className="text-right shrink-0">
                   {statusBadge(o.status)}
@@ -90,7 +73,7 @@ export function CustomerDashboard() {
 }
 
 // ============================================================
-// Admin Dashboard (placeholder)
+// Admin Dashboard (placeholder — structure ready to build on)
 // ============================================================
 export function AdminDashboard() {
   return (
@@ -99,14 +82,6 @@ export function AdminDashboard() {
         <h1 className="font-display text-2xl font-bold text-gray-900">Admin Panel</h1>
         <p className="text-gray-500 text-sm mt-1">Platform administration</p>
       </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Vendors" value="3" icon={<Package size={20} />} color="green" />
-        <StatCard label="Total Products" value="24" icon={<Package size={20} />} color="yellow" />
-        <StatCard label="Total Orders" value="47" icon={<ShoppingCart size={20} />} color="blue" />
-        <StatCard label="Revenue (BWP)" value="142,000" icon={<ArrowRight size={20} />} color="green" />
-      </div>
-
       <Card>
         <div className="text-center py-8">
           <Package size={40} className="text-gray-300 mx-auto mb-3" />

@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   Sun, LayoutDashboard, Package, MessageSquare, ShoppingCart,
-  Settings, LogOut, Menu, X, ChevronRight,
-} from 'lucide-react'
+  Settings, LogOut, Menu, ChevronRight  } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
 interface NavItem {

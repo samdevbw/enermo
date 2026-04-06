@@ -1,8 +1,8 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import type { Category, Product, ProductFormData } from '@/types'
-import { Button, Input, Textarea, Select } from '@/components/ui'
+import type { Category,ProductFormData } from '@/types'
+import { Button, Input} from '@/components/ui'
 
 const schema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Package, MessageSquare, ShoppingCart, TrendingUp,
-  Plus, Pencil, Trash2, Eye, CheckCircle2, Clock, XCircle, ArrowRight,
+  Package, MessageSquare, ShoppingCart,
+  Plus, Pencil, Trash2, Eye, CheckCircle2, Clock, ArrowRight,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import {
@@ -12,13 +12,12 @@ import {
   useVendorOrders,
   useDeleteProduct,
   useUpdateOrderStatus,
+  useCreateProduct,
+  useUpdateProduct,
+  useCategories,
 } from '@/hooks/useProducts'
-import {
-  Button, Card, StatCard, Badge, Spinner, EmptyState, Modal,
-} from '@/components/ui'
+import { Button, Card, StatCard, Badge, EmptyState, Modal, Spinner } from '@/components/ui'
 import { ProductForm } from '@/components/products/ProductForm'
-import { useCreateProduct, useUpdateProduct } from '@/hooks/useProducts'
-import { SAMPLE_CATEGORIES, SAMPLE_PRODUCTS, SAMPLE_VENDORS } from '@/data/sampleData'
 import type { Product, ProductFormData } from '@/types'
 
 // ============================================================
@@ -26,10 +25,14 @@ import type { Product, ProductFormData } from '@/types'
 // ============================================================
 export function VendorDashboard() {
   const { profile } = useAuth()
+  const { data: vendor } = useVendorByProfile(profile?.id)
+  const { data: products = [] } = useVendorProducts(vendor?.id)
+  const { data: inquiries = [] } = useVendorInquiries(vendor?.id)
+  const { data: orders = [] } = useVendorOrders(vendor?.id)
 
-  // const { data: vendor } = useVendorByProfile(profile?.id)
-  const vendor = SAMPLE_VENDORS[0] // demo
-  const products = SAMPLE_PRODUCTS.filter((p) => p.vendor_id === vendor?.id)
+  const openInquiries = inquiries.filter((i) => i.status === 'open').length
+  const activeOrders = orders.filter((o) => !['delivered', 'cancelled'].includes(o.status)).length
+  const orderTotal = orders.reduce((sum, o) => sum + o.total_amount, 0)
 
   return (
     <div className="space-y-6">
@@ -40,32 +43,28 @@ export function VendorDashboard() {
         <p className="text-gray-500 text-sm mt-1">Here's an overview of your vendor activity.</p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           label="Total Products"
           value={products.length}
           icon={<Package size={20} />}
           color="yellow"
-          trend="2 added this month"
         />
         <StatCard
           label="Open Inquiries"
-          value={12}
+          value={openInquiries}
           icon={<MessageSquare size={20} />}
           color="blue"
-          trend="3 new today"
         />
         <StatCard
           label="Active Orders"
-          value={5}
+          value={activeOrders}
           icon={<ShoppingCart size={20} />}
           color="green"
-          trend="BWP 42,500 total"
+          trend={orderTotal > 0 ? `BWP ${new Intl.NumberFormat('en-BW', { minimumFractionDigits: 0 }).format(orderTotal)} total` : undefined}
         />
       </div>
 
-      {/* Quick links */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card className="hover:border-primary-200 transition-colors">
           <Link to="/vendor/products" className="flex items-center justify-between">
@@ -87,37 +86,37 @@ export function VendorDashboard() {
         </Card>
       </div>
 
-      {/* Recent products */}
       <Card>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-gray-900">Recent Products</h2>
-          <Link to="/vendor/products" className="text-sm text-primary-600 hover:underline">
-            View all
-          </Link>
+          <Link to="/vendor/products" className="text-sm text-primary-600 hover:underline">View all</Link>
         </div>
-        <div className="space-y-3">
-          {products.slice(0, 3).map((p) => (
-            <div key={p.id} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
-              <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0">
-                {p.product_images?.[0] && (
-                  <img src={p.product_images[0].url} alt="" className="w-full h-full object-cover" />
-                )}
+        {products.length === 0 ? (
+          <p className="text-sm text-gray-400 py-4 text-center">No products yet. <Link to="/vendor/products" className="text-primary-600 hover:underline">Add one</Link>.</p>
+        ) : (
+          <div className="space-y-3">
+            {products.slice(0, 3).map((p) => (
+              <div key={p.id} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
+                <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0">
+                  {p.product_images?.[0] && (
+                    <img src={p.product_images[0].url} alt="" className="w-full h-full object-cover" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">{p.title}</p>
+                  <p className="text-xs text-gray-500">
+                    {p.price
+                      ? new Intl.NumberFormat('en-BW', { style: 'currency', currency: 'BWP', minimumFractionDigits: 0 }).format(p.price)
+                      : 'Get Quote'}
+                  </p>
+                </div>
+                <Badge variant={p.status === 'published' ? 'green' : p.status === 'draft' ? 'yellow' : 'gray'}>
+                  {p.status}
+                </Badge>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{p.title}</p>
-                <p className="text-xs text-gray-500">
-                  {p.price
-                    ? new Intl.NumberFormat('en-BW', { style: 'currency', currency: 'BWP', minimumFractionDigits: 0 }).format(p.price)
-                    : 'Get Quote'
-                  }
-                </p>
-              </div>
-              <Badge variant={p.status === 'published' ? 'green' : p.status === 'draft' ? 'yellow' : 'gray'}>
-                {p.status}
-              </Badge>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </Card>
     </div>
   )
@@ -132,10 +131,11 @@ export function VendorProducts() {
   const [editProduct, setEditProduct] = useState<Product | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
-  const vendor = SAMPLE_VENDORS[0] // demo — replace with useVendorByProfile
-  const products = SAMPLE_PRODUCTS.filter((p) => p.vendor_id === vendor?.id)
-  const deleteProduct = useDeleteProduct()
+  const { data: vendor } = useVendorByProfile(profile?.id)
+  const { data: products = [], isLoading } = useVendorProducts(vendor?.id)
+  const { data: categories = [] } = useCategories()
 
+  const deleteProduct = useDeleteProduct()
   const createProduct = useCreateProduct(vendor?.id ?? '')
   const updateProduct = useUpdateProduct(editProduct?.id ?? '')
 
@@ -155,6 +155,8 @@ export function VendorProducts() {
     setDeleteId(null)
   }
 
+  if (isLoading) return <Spinner />
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -162,18 +164,24 @@ export function VendorProducts() {
           <h1 className="font-display text-2xl font-bold text-gray-900">Products</h1>
           <p className="text-gray-500 text-sm mt-0.5">{products.length} listing{products.length !== 1 ? 's' : ''}</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
+        <Button onClick={() => setCreateOpen(true)} disabled={!vendor}>
           <Plus size={16} />
           Add Product
         </Button>
       </div>
+
+      {!vendor && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-800">
+          You need to complete your vendor profile before adding products. Go to <Link to="/vendor/settings" className="font-medium underline">Settings</Link>.
+        </div>
+      )}
 
       {products.length === 0 ? (
         <EmptyState
           icon={<Package size={40} />}
           title="No products yet"
           description="Add your first product listing to start receiving inquiries."
-          action={<Button onClick={() => setCreateOpen(true)}><Plus size={16} />Add Product</Button>}
+          action={<Button onClick={() => setCreateOpen(true)} disabled={!vendor}><Plus size={16} />Add Product</Button>}
         />
       ) : (
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
@@ -250,33 +258,42 @@ export function VendorProducts() {
         </div>
       )}
 
-      {/* Create modal */}
       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Add New Product" size="lg">
         <ProductForm
-          categories={SAMPLE_CATEGORIES}
+          categories={categories}
           onSubmit={handleCreate}
           loading={createProduct.isPending}
           submitLabel="Create Product"
         />
       </Modal>
 
-      {/* Edit modal */}
       <Modal open={!!editProduct} onClose={() => setEditProduct(null)} title="Edit Product" size="lg">
-        {editProduct && (
-          <ProductForm
-            categories={SAMPLE_CATEGORIES}
-            defaultValues={{
-              ...editProduct,
-              features: editProduct.features?.join('\n') ?? '',
-            }}
-            onSubmit={handleEdit}
-            loading={updateProduct.isPending}
-            submitLabel="Save Changes"
-          />
-        )}
-      </Modal>
+  {editProduct && (
+    <ProductForm
+      categories={categories}
+      defaultValues={{
+        title: editProduct.title,
+        description: editProduct.description || '', // Convert null to empty string
+        price: editProduct.price || 0,
+        category_id: editProduct.category_id || '',
+        capacity: editProduct.capacity || '',
+        brand: editProduct.brand || '',
+        model: editProduct.model || '',
+        warranty_months: editProduct.warranty_months || 0,
+        features: Array.isArray(editProduct.features) 
+          ? editProduct.features.join('\n') 
+          : editProduct.features || '', // Convert array to string or handle null
+        stock_qty: editProduct.stock_qty || 0,
+        in_stock: editProduct.in_stock ?? true,
+        status: editProduct.status || 'published',
+      }}
+      onSubmit={handleEdit}
+      loading={updateProduct.isPending}
+      submitLabel="Save Changes"
+    />
+  )}
+</Modal>
 
-      {/* Delete confirm */}
       <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="Delete Product">
         <p className="text-sm text-gray-600 mb-5">
           Are you sure you want to delete this product? This action cannot be undone.
@@ -294,20 +311,17 @@ export function VendorProducts() {
 // Vendor Inquiries Page
 // ============================================================
 export function VendorInquiries() {
-  // const { data: vendor } = useVendorByProfile(profile?.id)
-  // const { data: inquiries, isLoading } = useVendorInquiries(vendor?.id)
-
-  // Demo data
-  const inquiries = [
-    { id: '1', customer_name: 'Thabo Sithole', customer_email: 'thabo@example.com', customer_phone: '+267 7111 2222', message: 'I am interested in the 3kW home system. What is the installation timeline and do you offer financing?', status: 'open' as const, created_at: '2024-03-20T10:00:00Z', product: { title: 'SunTech Home 3kW Solar System', slug: 'suntech-home-3kw' } },
-    { id: '2', customer_name: 'Mpho Kgomotso', customer_email: 'mpho@example.com', customer_phone: '', message: 'Can you deliver to Francistown? What is the delivery cost?', status: 'replied' as const, created_at: '2024-03-18T14:00:00Z', product: { title: 'LiFePO4 100Ah Lithium Battery', slug: 'lifepo4-100ah-lithium' } },
-  ]
+  const { profile } = useAuth()
+  const { data: vendor } = useVendorByProfile(profile?.id)
+  const { data: inquiries = [], isLoading } = useVendorInquiries(vendor?.id)
 
   const statusBadge = (status: string) => {
     if (status === 'open') return <Badge variant="yellow"><Clock size={11} className="mr-1" />Open</Badge>
     if (status === 'replied') return <Badge variant="blue">Replied</Badge>
     return <Badge variant="gray">Closed</Badge>
   }
+
+  if (isLoading) return <Spinner />
 
   return (
     <div className="space-y-5">
@@ -317,7 +331,7 @@ export function VendorInquiries() {
       </div>
 
       {inquiries.length === 0 ? (
-        <EmptyState icon={<MessageSquare size={40} />} title="No inquiries yet" />
+        <EmptyState icon={<MessageSquare size={40} />} title="No inquiries yet" description="When customers send you questions they'll appear here." />
       ) : (
         <div className="space-y-3">
           {inquiries.map((inq) => (
@@ -328,8 +342,12 @@ export function VendorInquiries() {
                     <p className="font-semibold text-gray-900">{inq.customer_name}</p>
                     {statusBadge(inq.status)}
                   </div>
-                  <p className="text-xs text-gray-400 mb-2">{inq.customer_email}{inq.customer_phone ? ` · ${inq.customer_phone}` : ''}</p>
-                  <p className="text-xs text-primary-600 mb-2">Re: {inq.product?.title}</p>
+                  <p className="text-xs text-gray-400 mb-2">
+                    {inq.customer_email}{inq.customer_phone ? ` · ${inq.customer_phone}` : ''}
+                  </p>
+                  {inq.product && (
+                    <p className="text-xs text-primary-600 mb-2">Re: {inq.product.title}</p>
+                  )}
                   <p className="text-sm text-gray-600 leading-relaxed">{inq.message}</p>
                 </div>
                 <div className="text-xs text-gray-400 shrink-0">
@@ -353,20 +371,19 @@ export function VendorInquiries() {
 // Vendor Orders Page
 // ============================================================
 export function VendorOrders() {
+  const { profile } = useAuth()
+  const { data: vendor } = useVendorByProfile(profile?.id)
+  const { data: orders = [], isLoading } = useVendorOrders(vendor?.id)
   const updateStatus = useUpdateOrderStatus()
 
-  // Demo data
-  const orders = [
-    { id: 'o1', order_number: 'ORD-20240320-ab1234', quantity: 1, unit_price: 28500, total_amount: 28500, currency: 'BWP', status: 'pending' as const, created_at: '2024-03-20T10:00:00Z', product: { title: 'SunTech Home 3kW Solar System', slug: 'suntech-home-3kw' }, customer: { full_name: 'Thabo Sithole', phone: '+267 7111 2222' } },
-    { id: 'o2', order_number: 'ORD-20240318-cd5678', quantity: 2, unit_price: 4800, total_amount: 9600, currency: 'BWP', status: 'confirmed' as const, created_at: '2024-03-18T09:00:00Z', product: { title: 'LiFePO4 100Ah Lithium Battery', slug: 'lifepo4-100ah-lithium' }, customer: { full_name: 'Mpho Kgomotso', phone: '' } },
-  ]
-
-  const statusVariant = (s: string) => {
+  const statusVariant = (s: string): 'green' | 'yellow' | 'red' | 'blue' | 'gray' => {
     if (s === 'delivered') return 'green'
     if (s === 'cancelled') return 'red'
     if (s === 'pending') return 'yellow'
     return 'blue'
   }
+
+  if (isLoading) return <Spinner />
 
   return (
     <div className="space-y-5">
@@ -376,7 +393,7 @@ export function VendorOrders() {
       </div>
 
       {orders.length === 0 ? (
-        <EmptyState icon={<ShoppingCart size={40} />} title="No orders yet" />
+        <EmptyState icon={<ShoppingCart size={40} />} title="No orders yet" description="Orders from customers will appear here." />
       ) : (
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
@@ -406,9 +423,7 @@ export function VendorOrders() {
                       {new Intl.NumberFormat('en-BW', { style: 'currency', currency: o.currency, minimumFractionDigits: 0 }).format(o.total_amount)}
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant={statusVariant(o.status) as 'green' | 'yellow' | 'red' | 'blue' | 'gray'}>
-                        {o.status}
-                      </Badge>
+                      <Badge variant={statusVariant(o.status)}>{o.status}</Badge>
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell text-right">
                       {o.status === 'pending' && (

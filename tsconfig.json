@@ -14,17 +14,8 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-<<<<<<< HEAD
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-=======
-       "paths": {
-      "@/*": ["./src/*"]         
->>>>>>> f43adbf (Initial commit - Not first - Enermo project)
-    }
-  },
+    "noFallthroughCasesInSwitch": true,  
+    },         
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

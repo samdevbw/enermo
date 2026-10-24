@@ -173,8 +173,8 @@ export function Landing() {
             </div>
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=800&q=80"
-                alt="Solar installation in Africa"
+                src="https://images.unsplash.com/photo-1521618755572-156ae0cdd74d?w=800&q=80"
+                alt="Rooftop solar panels installation"
                 className="rounded-2xl shadow-xl w-full object-cover aspect-[4/3]"
               />
               <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4 flex items-center gap-3">

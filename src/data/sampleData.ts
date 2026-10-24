@@ -3,7 +3,7 @@ import type { Product, Vendor, Category } from '@/types'
 // Solar and clean energy Unsplash images — all verified energy-relevant
 const IMG = {
   solar1: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&q=80',  // rooftop solar panels
-  solar2: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=800&q=80',  // wind & solar at sunset
+  solar2: 'https://images.unsplash.com/photo-1521618755572-156ae0cdd74d?w=800&q=80',  // rooftop solar panels close-up
   solar3: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?w=800&q=80',  // solar panel installation workers
   battery: 'https://images.unsplash.com/photo-1600091166971-7f9faad6c498?w=800&q=80', // wall-mounted battery storage
   pump: 'https://images.unsplash.com/photo-1567427018141-0584cfcbf1b8?w=800&q=80',   // solar water pump / irrigation

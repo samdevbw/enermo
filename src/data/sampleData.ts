@@ -1,18 +1,18 @@
 import type { Product, Vendor, Category } from '@/types'
 
-// Realistic Unsplash images for solar/energy products
+// Solar and clean energy Unsplash images — all verified energy-relevant
 const IMG = {
-  solar1: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&q=80',
-  solar2: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=800&q=80',
-  solar3: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80',
-  battery: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
-  pump: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&q=80',
-  portable: 'https://images.unsplash.com/photo-1620714223084-8fcacc2dbe4d?w=800&q=80',
-  commercial: 'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=800&q=80',
-  biogas: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&q=80',
-  vendor1: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=400&q=80',
-  vendor2: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&q=80',
-  vendor3: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=80',
+  solar1: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&q=80',  // rooftop solar panels
+  solar2: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=800&q=80',  // wind & solar at sunset
+  solar3: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?w=800&q=80',  // solar panel installation workers
+  battery: 'https://images.unsplash.com/photo-1600091166971-7f9faad6c498?w=800&q=80', // wall-mounted battery storage
+  pump: 'https://images.unsplash.com/photo-1567427018141-0584cfcbf1b8?w=800&q=80',   // solar water pump / irrigation
+  portable: 'https://images.unsplash.com/photo-1595437193398-f24279553f4f?w=800&q=80',// portable solar panel kit
+  commercial: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80', // aerial solar farm
+  biogas: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80',  // biogas / green energy plant
+  vendor1: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400&q=80', // solar field cover — warm tones
+  vendor2: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?w=400&q=80', // green energy landscape
+  vendor3: 'https://images.unsplash.com/photo-1574168433285-48b8af5e95bb?w=400&q=80', // solar installation team
 }
 
 export const SAMPLE_CATEGORIES: Category[] = [

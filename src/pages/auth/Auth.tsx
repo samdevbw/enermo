@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { Sun } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { Button, Input } from '@/components/ui'
+import { AuthDivider, GoogleSignInButton } from '@/components/auth/GoogleSignInButton'
 import type { UserRole } from '@/types'
 
 // ============================================================
@@ -56,6 +57,9 @@ export function SignIn() {
               {error}
             </div>
           )}
+
+          <GoogleSignInButton onError={setError} />
+          <AuthDivider />
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input
@@ -177,6 +181,13 @@ export function SignUp() {
               ))}
             </div>
           </div>
+
+          <GoogleSignInButton
+            role={selectedRole}
+            label="Sign up with Google"
+            onError={setError}
+          />
+          <AuthDivider />
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input

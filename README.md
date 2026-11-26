@@ -111,3 +111,35 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 ```bash
 npm run dev
 ```
+
+## Google Sign-In
+
+Google login uses Supabase Auth's OAuth provider. Both `/signin` and `/signup` show a
+**Continue with Google** button; after Google, users land on `/auth/callback`, which
+finishes the session and routes them by role.
+
+### One-time setup
+
+1. **Database** — run `supabase/migrations/003_google_oauth_and_role_hardening.sql` in the
+   Supabase SQL Editor. It maps Google name/photo into `profiles`, adds the
+   `claim_vendor_role()` RPC used when someone picks "Sell Products" and signs up with
+   Google, and blocks clients from changing their own `profiles.role`.
+2. **Google Cloud Console** → APIs & Services → Credentials → *Create OAuth client ID*
+   (type: Web application)
+   - Authorized JavaScript origins: `https://enermo.co.bw`, `http://localhost:5173`
+   - Authorized redirect URI: `https://dqrcsaxqiezfflgxokqc.supabase.co/auth/v1/callback`
+   - OAuth consent screen: app name *Enermo*, support email, authorized domain `enermo.co.bw`;
+     scopes `email`, `profile`, `openid`. Publish the app (otherwise only test users can log in).
+3. **Supabase** → Authentication → Sign In / Providers → **Google**: enable it and paste the
+   Client ID and Client Secret.
+4. **Supabase** → Authentication → URL Configuration
+   - Site URL: `https://enermo.co.bw`
+   - Redirect URLs: `https://enermo.co.bw/auth/callback`, `http://localhost:5173/auth/callback`
+     (add Netlify preview URLs too if you test there, e.g. `https://*--enermo.netlify.app/auth/callback`)
+
+No new environment variables are needed — the Google secret lives in Supabase, never in the frontend.
+
+### Notes
+- If a Google account's email matches an existing email/password user, Supabase links them
+  automatically (Google emails are verified).
+- `public/_redirects` already rewrites all paths to `index.html`, so `/auth/callback` works on Netlify.

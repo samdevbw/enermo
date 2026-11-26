@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext } from 'react'
 import type { User, Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
+import { saveOAuthIntent, type SignupRole } from '@/lib/oauthIntent'
 import type { Profile, UserRole } from '@/types'
 
 interface AuthContextType {
@@ -10,6 +11,10 @@ interface AuthContextType {
   loading: boolean
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, fullName: string, role: UserRole) => Promise<void>
+  /** Redirects the browser to Google. Resolves only if the redirect fails to start. */
+  signInWithGoogle: (role?: SignupRole) => Promise<void>
+  /** Re-fetch the profile, e.g. after a server-side role change. */
+  refreshProfile: () => Promise<Profile | null>
   signOut: () => Promise<void>
 }
 
@@ -25,14 +30,16 @@ export function useAuthProvider(): AuthContextType {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
 
-  async function loadProfile(userId: string) {
+  async function loadProfile(userId: string): Promise<Profile | null> {
     const { data } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single()
 
-    setProfile(data as Profile | null)
+    const next = data as Profile | null
+    setProfile(next)
+    return next
   }
 
   useEffect(() => {
@@ -79,6 +86,29 @@ export function useAuthProvider(): AuthContextType {
     if (error) throw error
   }
 
+  async function signInWithGoogle(role: SignupRole = 'customer') {
+    saveOAuthIntent({ role })
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        // Must be listed under Supabase → Auth → URL Configuration → Redirect URLs
+        redirectTo: `${window.location.origin}/auth/callback`,
+        // Always show the account chooser — users often have work + personal Google accounts
+        queryParams: { prompt: 'select_account' },
+      },
+    })
+    if (error) throw error
+  }
+
+  async function refreshProfile() {
+    const { data: { user: current } } = await supabase.auth.getUser()
+    if (!current) {
+      setProfile(null)
+      return null
+    }
+    return loadProfile(current.id)
+  }
+
 const signOut = async () => {
   const { error } = await supabase.auth.signOut()
 
@@ -91,5 +121,5 @@ const signOut = async () => {
   setProfile(null)
 }
 
-  return { user, session, profile, loading, signIn, signUp, signOut }
+  return { user, session, profile, loading, signIn, signUp, signInWithGoogle, refreshProfile, signOut }
 }

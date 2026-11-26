@@ -46,7 +46,7 @@ export function SignIn() {
             <div className="w-9 h-9 bg-primary-400 rounded-xl flex items-center justify-center">
               <Sun size={18} className="text-white" />
             </div>
-            Ener<span className="text-primary-500">mo</span>
+            <span>Ener<span className="text-primary-500">mo</span></span>
           </Link>
           <p className="text-gray-500 mt-1">Sign in to your account</p>
         </div>
@@ -76,6 +76,11 @@ export function SignIn() {
               error={errors.password?.message}
               {...register('password')}
             />
+            <div className="flex justify-end -mt-2">
+              <Link to="/forgot-password" className="text-sm text-primary-600 font-medium hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <Button type="submit" fullWidth size="lg" loading={isSubmitting}>
               Sign In
             </Button>
@@ -139,7 +144,7 @@ export function SignUp() {
             <div className="w-9 h-9 bg-primary-400 rounded-xl flex items-center justify-center">
               <Sun size={18} className="text-white" />
             </div>
-            Ener<span className="text-primary-500">mo</span>
+            <span>Ener<span className="text-primary-500">mo</span></span>
           </Link>
           <p className="text-gray-500 mt-1">Create your Enermo account</p>
         </div>

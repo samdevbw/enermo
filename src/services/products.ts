@@ -160,31 +160,3 @@ export async function deleteProduct(productId: string): Promise<void> {
   const { error } = await supabase.from('products').delete().eq('id', productId)
   if (error) throw error
 }
-
-export async function uploadProductImage(
-  productId: string,
-  file: File,
-  isPrimary = false
-): Promise<string> {
-  const ext = file.name.split('.').pop()
-  const path = `products/${productId}/${Date.now()}.${ext}`
-
-  const { error: uploadError } = await supabase.storage
-    .from('product-images')
-    .upload(path, file)
-
-  if (uploadError) throw uploadError
-
-  const { data: { publicUrl } } = supabase.storage
-    .from('product-images')
-    .getPublicUrl(path)
-
-  const { error: dbError } = await supabase.from('product_images').insert({
-    product_id: productId,
-    url: publicUrl,
-    is_primary: isPrimary,
-  })
-
-  if (dbError) throw dbError
-  return publicUrl
-}

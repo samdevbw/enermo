@@ -18,6 +18,7 @@ import {
 } from '@/hooks/useProducts'
 import { Button, Card, StatCard, Badge, EmptyState, Modal, Spinner } from '@/components/ui'
 import { ProductForm } from '@/components/products/ProductForm'
+import { ProductPhotos } from '@/components/products/ProductPhotos'
 import type { Product, ProductFormData } from '@/types'
 
 // ============================================================
@@ -153,14 +154,25 @@ export function VendorProducts() {
   const createProduct = useCreateProduct(vendor?.id ?? '')
   const updateProduct = useUpdateProduct(editProduct?.id ?? '')
 
+  // Photos attach to a saved product, so after creating we reopen the new
+  // product in the edit modal with the Photos section ready to use.
+  const [justCreated, setJustCreated] = useState(false)
+
   async function handleCreate(data: ProductFormData) {
-    await createProduct.mutateAsync(data)
+    const created = await createProduct.mutateAsync(data)
     setCreateOpen(false)
+    setJustCreated(true)
+    setEditProduct(created)
+  }
+
+  function closeEdit() {
+    setEditProduct(null)
+    setJustCreated(false)
   }
 
   async function handleEdit(data: ProductFormData) {
     await updateProduct.mutateAsync(data)
-    setEditProduct(null)
+    closeEdit()
   }
 
   async function handleDelete() {
@@ -273,6 +285,7 @@ export function VendorProducts() {
       )}
 
       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Add New Product" size="lg">
+        <p className="text-sm text-gray-500 mb-4">Fill in the details — you'll add photos in the next step.</p>
         <ProductForm
           categories={categories}
           onSubmit={handleCreate}
@@ -281,7 +294,25 @@ export function VendorProducts() {
         />
       </Modal>
 
-      <Modal open={!!editProduct} onClose={() => setEditProduct(null)} title="Edit Product" size="lg">
+      <Modal
+        open={!!editProduct}
+        onClose={closeEdit}
+        title={justCreated ? 'Add photos' : 'Edit Product'}
+        size="lg"
+      >
+  {editProduct && justCreated && (
+    <div className="mb-4 px-4 py-3 rounded-lg bg-forest-50 border border-forest-200 text-sm text-forest-800">
+      <strong>{editProduct.title}</strong> was created. Add photos below — they save as you upload.
+    </div>
+  )}
+  {editProduct && (
+    <div className="mb-6 pb-6 border-b border-gray-100">
+      <ProductPhotos productId={editProduct.id} productTitle={editProduct.title} />
+      {justCreated && (
+        <Button className="mt-4" fullWidth onClick={closeEdit}>Done</Button>
+      )}
+    </div>
+  )}
   {editProduct && (
     <ProductForm
       categories={categories}

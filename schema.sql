@@ -1,6 +1,9 @@
 -- ============================================================
--- ENERMO MVP SCHEMA
--- Run this in the Supabase SQL editor
+-- ⚠️  SUPERSEDED — kept for history only.
+-- The source of truth is now supabase/migrations/, starting with
+-- 000_baseline.sql. Add schema changes as new numbered migrations there.
+-- ============================================================
+-- ENERMO MVP SCHEMA (original)
 -- ============================================================
 
 -- Enable UUID extension

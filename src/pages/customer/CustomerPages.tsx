@@ -71,26 +71,3 @@ export function CustomerDashboard() {
     </div>
   )
 }
-
-// ============================================================
-// Admin Dashboard (placeholder — structure ready to build on)
-// ============================================================
-export function AdminDashboard() {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-gray-900">Admin Panel</h1>
-        <p className="text-gray-500 text-sm mt-1">Platform administration</p>
-      </div>
-      <Card>
-        <div className="text-center py-8">
-          <Package size={40} className="text-gray-300 mx-auto mb-3" />
-          <h3 className="font-semibold text-gray-700 mb-1">Admin features coming soon</h3>
-          <p className="text-sm text-gray-400">
-            Vendor approval, product moderation, and platform analytics will be built here.
-          </p>
-        </div>
-      </Card>
-    </div>
-  )
-}

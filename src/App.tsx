@@ -32,7 +32,9 @@ import {
 } from '@/pages/vendor/VendorPages'
 
 // Customer + Admin
-import { CustomerDashboard, AdminDashboard } from '@/pages/customer/CustomerPages'
+import { CustomerDashboard } from '@/pages/customer/CustomerPages'
+import { AdminDashboard } from '@/pages/admin/AdminDashboard'
+import { AdminMessages } from '@/pages/admin/AdminMessages'
 import { CustomerSettings, VendorSettings } from '@/pages/settings/Settings'
 import { VendorVerification } from '@/pages/admin/VendorVerification'
 
@@ -100,6 +102,7 @@ export default function App() {
               <Route element={<DashboardLayout />}>
                 <Route path="admin" element={<AdminDashboard />} />
                 <Route path="admin/vendors" element={<VendorVerification />} />
+                <Route path="admin/messages" element={<AdminMessages />} />
                 <Route path="admin/products" element={<div className="p-4"><h1 className="font-display text-xl font-bold">Product Moderation</h1></div>} />
                 <Route path="admin/orders" element={<div className="p-4"><h1 className="font-display text-xl font-bold">All Orders</h1></div>} />
               </Route>

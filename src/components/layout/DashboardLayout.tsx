@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   Sun, LayoutDashboard, Package, MessageSquare, ShoppingCart,
-  Settings, LogOut, Menu, ChevronRight  } from 'lucide-react'
+  Settings, LogOut, Menu, ChevronRight, Store, Mail } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
 interface NavItem {
@@ -27,7 +27,8 @@ const customerNav: NavItem[] = [
 
 const adminNav: NavItem[] = [
   { to: '/admin', icon: <LayoutDashboard size={18} />, label: 'Overview' },
-  { to: '/admin/vendors', icon: <Package size={18} />, label: 'Vendors' },
+  { to: '/admin/vendors', icon: <Store size={18} />, label: 'Vendors' },
+  { to: '/admin/messages', icon: <Mail size={18} />, label: 'Messages' },
   { to: '/admin/products', icon: <Package size={18} />, label: 'Products' },
   { to: '/admin/orders', icon: <ShoppingCart size={18} />, label: 'Orders' },
 ]

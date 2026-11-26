@@ -174,6 +174,7 @@ export interface VendorProfileFormData {
   website: string
   location: string
   city: string
+  logo_url?: string | null
 }
 
 // ============================================================

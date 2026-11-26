@@ -69,8 +69,12 @@ export function DashboardLayout() {
       {/* Profile pill */}
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-gray-50">
-          <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-sm">
-            {profile?.full_name?.charAt(0).toUpperCase() ?? 'U'}
+          <div className="w-9 h-9 shrink-0 overflow-hidden rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-sm">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            ) : (
+              profile?.full_name?.charAt(0).toUpperCase() ?? 'U'
+            )}
           </div>
           <div className="min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">{profile?.full_name}</p>

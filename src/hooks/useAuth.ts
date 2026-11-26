@@ -58,13 +58,19 @@ export function useAuthProvider(): AuthContextType {
       }
     })
 
-    // Listen for auth changes
+    // Listen for auth changes.
+    // The callback must stay synchronous: supabase-js holds an internal auth
+    // lock while it runs, and any Supabase call awaited inside it (our profile
+    // query reads the session) waits for that same lock — a deadlock that
+    // leaves the app on a spinner. Deferring with setTimeout releases the lock
+    // first. See https://supabase.com/docs/reference/javascript/auth-onauthstatechange
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         setSession(session)
         setUser(session?.user ?? null)
         if (session?.user) {
-          await loadProfile(session.user.id)
+          const userId = session.user.id
+          setTimeout(() => { void loadProfile(userId) }, 0)
         } else {
           setProfile(null)
         }

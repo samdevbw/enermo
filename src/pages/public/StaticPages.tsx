@@ -96,27 +96,41 @@ import { z } from 'zod'
 import { useState } from 'react'
 import { Mail, Phone, MapPin, CheckCircle2 } from 'lucide-react'
 import { Input } from '@/components/ui'
+import { useAuth } from '@/hooks/useAuth'
+import { submitContactMessage } from '@/services/contact'
 
+// Limits mirror the CHECK constraints on public.contact_messages
 const contactSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  subject: z.string().min(3),
-  message: z.string().min(10),
+  name: z.string().trim().min(2, 'Please enter your name').max(120),
+  email: z.string().trim().email('Please enter a valid email').max(254),
+  subject: z.string().trim().min(3, 'Please add a subject').max(200),
+  message: z.string().trim().min(10, 'Message must be at least 10 characters').max(5000),
 })
 
 type ContactForm = z.infer<typeof contactSchema>
 
 export function Contact() {
+  const { user, profile } = useAuth()
   const [done, setDone] = useState(false)
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactForm>({
+  const [submitError, setSubmitError] = useState('')
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<ContactForm>({
     resolver: zodResolver(contactSchema),
+    values: user
+      ? { name: profile?.full_name ?? '', email: user.email ?? '', subject: '', message: '' }
+      : undefined,
+    resetOptions: { keepDirtyValues: true },
   })
 
-  async function onSubmit(_data: ContactForm) {
-    // TODO: Wire to Supabase or email service
-    await new Promise((r) => setTimeout(r, 800))
-    setDone(true)
-    reset()
+  async function onSubmit(data: ContactForm) {
+    try {
+      setSubmitError('')
+      await submitContactMessage(data, user?.id ?? null)
+      setDone(true)
+      reset()
+    } catch (e: unknown) {
+      console.error('Contact form failed:', e)
+      setSubmitError('Sorry, your message could not be sent. Please try again or email us at hello@enermo.co.bw.')
+    }
   }
 
   return (
@@ -162,6 +176,11 @@ export function Contact() {
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <h2 className="font-display text-xl font-bold text-gray-900 mb-4">Send a Message</h2>
+              {submitError && (
+                <div role="alert" className="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                  {submitError}
+                </div>
+              )}
               <Input label="Your Name" error={errors.name?.message} {...register('name')} />
               <Input label="Email" type="email" error={errors.email?.message} {...register('email')} />
               <Input label="Subject" error={errors.subject?.message} {...register('subject')} />
@@ -176,7 +195,7 @@ export function Contact() {
                 />
                 {errors.message && <p className="text-xs text-red-600">{errors.message.message}</p>}
               </div>
-              <Button type="submit" fullWidth size="lg">Send Message</Button>
+              <Button type="submit" fullWidth size="lg" loading={isSubmitting}>Send Message</Button>
             </form>
           )}
         </div>

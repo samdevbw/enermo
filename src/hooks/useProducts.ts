@@ -12,6 +12,8 @@ import {
   fetchVendors,
   fetchVendorById,
   fetchVendorByProfileId,
+  createVendor,
+  updateVendor,
   fetchVendorInquiries,
   fetchVendorOrders,
   fetchCustomerOrders,
@@ -19,7 +21,7 @@ import {
   placeOrder,
   updateOrderStatus,
 } from '@/services/vendors'
-import type { FilterState, ProductFormData, InquiryFormData, OrderFormData } from '@/types'
+import type { FilterState, ProductFormData, InquiryFormData, OrderFormData, VendorProfileFormData } from '@/types'
 
 // ---- Categories ----
 
@@ -111,6 +113,25 @@ export function useVendorByProfile(profileId: string | undefined) {
     queryKey: ['vendor-profile', profileId],
     queryFn: () => fetchVendorByProfileId(profileId!),
     enabled: !!profileId,
+  })
+}
+
+/**
+ * Creates the vendor's business record the first time, updates it after that.
+ * Until this record exists a vendor can't add products.
+ */
+export function useSaveVendor(profileId: string | undefined) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ vendorId, data }: { vendorId: string | undefined; data: VendorProfileFormData }) => {
+      if (!profileId) throw new Error('Not signed in')
+      return vendorId ? updateVendor(vendorId, data) : createVendor(profileId, data)
+    },
+    onSuccess: (vendor) => {
+      qc.setQueryData(['vendor-profile', profileId], vendor)
+      qc.invalidateQueries({ queryKey: ['vendor', vendor.id] })
+      qc.invalidateQueries({ queryKey: ['vendors'] })
+    },
   })
 }
 

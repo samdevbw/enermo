@@ -13,6 +13,10 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string, role: UserRole) => Promise<void>
   /** Redirects the browser to Google. Resolves only if the redirect fails to start. */
   signInWithGoogle: (role?: SignupRole) => Promise<void>
+  /** Emails a password-reset link that opens /reset-password. */
+  requestPasswordReset: (email: string) => Promise<void>
+  /** Sets a new password for the signed-in (or recovering) user. */
+  updatePassword: (password: string) => Promise<void>
   /** Re-fetch the profile, e.g. after a server-side role change. */
   refreshProfile: () => Promise<Profile | null>
   signOut: () => Promise<void>
@@ -54,13 +58,19 @@ export function useAuthProvider(): AuthContextType {
       }
     })
 
-    // Listen for auth changes
+    // Listen for auth changes.
+    // The callback must stay synchronous: supabase-js holds an internal auth
+    // lock while it runs, and any Supabase call awaited inside it (our profile
+    // query reads the session) waits for that same lock — a deadlock that
+    // leaves the app on a spinner. Deferring with setTimeout releases the lock
+    // first. See https://supabase.com/docs/reference/javascript/auth-onauthstatechange
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         setSession(session)
         setUser(session?.user ?? null)
         if (session?.user) {
-          await loadProfile(session.user.id)
+          const userId = session.user.id
+          setTimeout(() => { void loadProfile(userId) }, 0)
         } else {
           setProfile(null)
         }
@@ -100,6 +110,19 @@ export function useAuthProvider(): AuthContextType {
     if (error) throw error
   }
 
+  async function requestPasswordReset(email: string) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      // Must be listed under Supabase → Auth → URL Configuration → Redirect URLs
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) throw error
+  }
+
+  async function updatePassword(password: string) {
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) throw error
+  }
+
   async function refreshProfile() {
     const { data: { user: current } } = await supabase.auth.getUser()
     if (!current) {
@@ -121,5 +144,5 @@ const signOut = async () => {
   setProfile(null)
 }
 
-  return { user, session, profile, loading, signIn, signUp, signInWithGoogle, refreshProfile, signOut }
+  return { user, session, profile, loading, signIn, signUp, signInWithGoogle, requestPasswordReset, updatePassword, refreshProfile, signOut }
 }

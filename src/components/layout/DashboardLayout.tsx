@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   Sun, LayoutDashboard, Package, MessageSquare, ShoppingCart,
-  Settings, LogOut, Menu, ChevronRight  } from 'lucide-react'
+  Settings, LogOut, Menu, ChevronRight, Store, Mail } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
 interface NavItem {
@@ -27,7 +27,8 @@ const customerNav: NavItem[] = [
 
 const adminNav: NavItem[] = [
   { to: '/admin', icon: <LayoutDashboard size={18} />, label: 'Overview' },
-  { to: '/admin/vendors', icon: <Package size={18} />, label: 'Vendors' },
+  { to: '/admin/vendors', icon: <Store size={18} />, label: 'Vendors' },
+  { to: '/admin/messages', icon: <Mail size={18} />, label: 'Messages' },
   { to: '/admin/products', icon: <Package size={18} />, label: 'Products' },
   { to: '/admin/orders', icon: <ShoppingCart size={18} />, label: 'Orders' },
 ]
@@ -61,7 +62,7 @@ export function DashboardLayout() {
           <div className="w-8 h-8 bg-primary-400 rounded-lg flex items-center justify-center">
             <Sun size={16} className="text-white" />
           </div>
-          Ener<span className="text-primary-500">mo</span>
+          <span>Ener<span className="text-primary-500">mo</span></span>
         </NavLink>
         <p className="text-xs text-gray-500 mt-1 ml-10">{roleLabel}</p>
       </div>
@@ -69,8 +70,12 @@ export function DashboardLayout() {
       {/* Profile pill */}
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-gray-50">
-          <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-sm">
-            {profile?.full_name?.charAt(0).toUpperCase() ?? 'U'}
+          <div className="w-9 h-9 shrink-0 overflow-hidden rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-sm">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            ) : (
+              profile?.full_name?.charAt(0).toUpperCase() ?? 'U'
+            )}
           </div>
           <div className="min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">{profile?.full_name}</p>
@@ -140,7 +145,7 @@ export function DashboardLayout() {
             <Menu size={20} />
           </button>
           <span className="font-display font-bold text-gray-900">
-            Ener<span className="text-primary-500">mo</span>
+            <span>Ener<span className="text-primary-500">mo</span></span>
           </span>
           <div className="w-9" />
         </header>

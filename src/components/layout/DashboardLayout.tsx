@@ -61,7 +61,7 @@ export function DashboardLayout() {
           <div className="w-8 h-8 bg-primary-400 rounded-lg flex items-center justify-center">
             <Sun size={16} className="text-white" />
           </div>
-          Ener<span className="text-primary-500">mo</span>
+          <span>Ener<span className="text-primary-500">mo</span></span>
         </NavLink>
         <p className="text-xs text-gray-500 mt-1 ml-10">{roleLabel}</p>
       </div>
@@ -144,7 +144,7 @@ export function DashboardLayout() {
             <Menu size={20} />
           </button>
           <span className="font-display font-bold text-gray-900">
-            Ener<span className="text-primary-500">mo</span>
+            <span>Ener<span className="text-primary-500">mo</span></span>
           </span>
           <div className="w-9" />
         </header>

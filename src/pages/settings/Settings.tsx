@@ -8,6 +8,7 @@ import { useSaveVendor, useVendorByProfile } from '@/hooks/useProducts'
 import { updateProfile, uploadProfileImage } from '@/services/profile'
 import { Button, Card, Input, Spinner, Textarea } from '@/components/ui'
 import { ImageUploadField } from '@/components/settings/ImageUploadField'
+import { VerificationSection } from '@/components/verification/VerificationSection'
 import type { Vendor } from '@/types'
 
 // ------------------------------------------------------------
@@ -258,10 +259,14 @@ export function CustomerSettings() {
 }
 
 export function VendorSettings() {
+  const { profile } = useAuth()
+  const { data: vendor } = useVendorByProfile(profile?.id)
   return (
     <div className="max-w-3xl space-y-6">
       <PageTitle>Settings</PageTitle>
       <BusinessSection />
+      {/* Documents attach to the vendor record, so this appears once it exists */}
+      {vendor && <VerificationSection vendor={vendor} />}
       <ProfileSection />
     </div>
   )

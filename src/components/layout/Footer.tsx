@@ -12,7 +12,7 @@ export function Footer() {
               <div className="w-8 h-8 bg-primary-400 rounded-lg flex items-center justify-center">
                 <Sun size={16} className="text-white" />
               </div>
-              Ener<span className="text-primary-400">mo</span>
+              <span>Ener<span className="text-primary-400">mo</span></span>
             </Link>
             <p className="text-sm leading-relaxed">
               Africa's clean energy marketplace. Connecting solar vendors with customers across Botswana and beyond.

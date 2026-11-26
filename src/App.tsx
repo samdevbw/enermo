@@ -34,6 +34,7 @@ import {
 // Customer + Admin
 import { CustomerDashboard, AdminDashboard } from '@/pages/customer/CustomerPages'
 import { CustomerSettings, VendorSettings } from '@/pages/settings/Settings'
+import { VendorVerification } from '@/pages/admin/VendorVerification'
 
 // ============================================================
 // Auth Provider wrapper
@@ -98,7 +99,7 @@ export default function App() {
             <Route element={<RoleGuard roles={['admin']} />}>
               <Route element={<DashboardLayout />}>
                 <Route path="admin" element={<AdminDashboard />} />
-                <Route path="admin/vendors" element={<div className="p-4"><h1 className="font-display text-xl font-bold">Vendor Management</h1></div>} />
+                <Route path="admin/vendors" element={<VendorVerification />} />
                 <Route path="admin/products" element={<div className="p-4"><h1 className="font-display text-xl font-bold">Product Moderation</h1></div>} />
                 <Route path="admin/orders" element={<div className="p-4"><h1 className="font-display text-xl font-bold">All Orders</h1></div>} />
               </Route>

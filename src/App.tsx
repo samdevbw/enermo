@@ -21,6 +21,7 @@ import { About, Contact } from '@/pages/public/StaticPages'
 // Auth pages
 import { SignIn, SignUp } from '@/pages/auth/Auth'
 import { AuthCallback } from '@/pages/auth/AuthCallback'
+import { ForgotPassword, ResetPassword } from '@/pages/auth/PasswordReset'
 
 // Vendor pages
 import {
@@ -32,6 +33,8 @@ import {
 
 // Customer + Admin
 import { CustomerDashboard, AdminDashboard } from '@/pages/customer/CustomerPages'
+import { CustomerSettings, VendorSettings } from '@/pages/settings/Settings'
+import { VendorVerification } from '@/pages/admin/VendorVerification'
 
 // ============================================================
 // Auth Provider wrapper
@@ -69,13 +72,15 @@ export default function App() {
             <Route path="signin" element={<SignIn />} />
             <Route path="signup" element={<SignUp />} />
             <Route path="auth/callback" element={<AuthCallback />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="reset-password" element={<ResetPassword />} />
 
             {/* ---- Customer routes ---- */}
             <Route element={<AuthGuard />}>
               <Route element={<DashboardLayout />}>
                 <Route path="dashboard" element={<CustomerDashboard />} />
                 <Route path="orders" element={<CustomerDashboard />} />
-                <Route path="settings" element={<div className="p-4"><h1 className="font-display text-xl font-bold">Settings — Coming Soon</h1></div>} />
+                <Route path="settings" element={<CustomerSettings />} />
               </Route>
             </Route>
 
@@ -86,7 +91,7 @@ export default function App() {
                 <Route path="vendor/products" element={<VendorProducts />} />
                 <Route path="vendor/inquiries" element={<VendorInquiries />} />
                 <Route path="vendor/orders" element={<VendorOrders />} />
-                <Route path="vendor/settings" element={<div className="p-4"><h1 className="font-display text-xl font-bold">Vendor Settings — Coming Soon</h1></div>} />
+                <Route path="vendor/settings" element={<VendorSettings />} />
               </Route>
             </Route>
 
@@ -94,7 +99,7 @@ export default function App() {
             <Route element={<RoleGuard roles={['admin']} />}>
               <Route element={<DashboardLayout />}>
                 <Route path="admin" element={<AdminDashboard />} />
-                <Route path="admin/vendors" element={<div className="p-4"><h1 className="font-display text-xl font-bold">Vendor Management</h1></div>} />
+                <Route path="admin/vendors" element={<VendorVerification />} />
                 <Route path="admin/products" element={<div className="p-4"><h1 className="font-display text-xl font-bold">Product Moderation</h1></div>} />
                 <Route path="admin/orders" element={<div className="p-4"><h1 className="font-display text-xl font-bold">All Orders</h1></div>} />
               </Route>

@@ -25,7 +25,7 @@ import type { Product, ProductFormData } from '@/types'
 // ============================================================
 export function VendorDashboard() {
   const { profile } = useAuth()
-  const { data: vendor } = useVendorByProfile(profile?.id)
+  const { data: vendor, isLoading: vendorLoading } = useVendorByProfile(profile?.id)
   const { data: products = [] } = useVendorProducts(vendor?.id)
   const { data: inquiries = [] } = useVendorInquiries(vendor?.id)
   const { data: orders = [] } = useVendorOrders(vendor?.id)
@@ -42,6 +42,20 @@ export function VendorDashboard() {
         </h1>
         <p className="text-gray-500 text-sm mt-1">Here's an overview of your vendor activity.</p>
       </div>
+
+      {!vendorLoading && !vendor && (
+        <Card className="border-primary-200 bg-primary-50">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+            <div>
+              <p className="font-semibold text-gray-900">Set up your business profile</p>
+              <p className="text-sm text-gray-600">Add your business name and contact details to start listing products.</p>
+            </div>
+            <Link to="/vendor/settings">
+              <Button>Set up now <ArrowRight size={16} /></Button>
+            </Link>
+          </div>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard

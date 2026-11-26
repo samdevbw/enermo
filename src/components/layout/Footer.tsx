@@ -56,6 +56,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               {[
                 ['About Enermo', '/about'],
+                ['EcoGuide', '/ecoguide'],
                 ['Vendor Directory', '/vendors'],
                 ['Become a Vendor', '/signup?role=vendor'],
                 ['Contact Us', '/contact'],

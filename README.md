@@ -143,3 +143,17 @@ No new environment variables are needed — the Google secret lives in Supabase,
 - If a Google account's email matches an existing email/password user, Supabase links them
   automatically (Google emails are verified).
 - `public/_redirects` already rewrites all paths to `index.html`, so `/auth/callback` works on Netlify.
+
+## EcoGuide (AI energy advisor)
+
+`/ecoguide` — chat, topic cards and a searchable Learn section. See
+`supabase/functions/ecoguide-chat/README.md` for the backend.
+
+Setup:
+1. Run `supabase/migrations/008_ecoguide.sql`, then `supabase/seed/ecoguide_knowledge.sql`.
+2. Deploy the function: `supabase functions deploy ecoguide-chat --no-verify-jwt`.
+3. Add the `OPENAI_API_KEY` secret in Supabase → Edge Functions → Secrets.
+
+Knowledge base: edit rows in `eco_guide_knowledge` (Table Editor). Articles are split into
+chunks automatically; embeddings are generated in the background after the next chat.
+Usage and "unanswered" questions (`knowledge_hits = 0`) are in `eco_guide_usage` (admins only).

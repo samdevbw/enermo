@@ -17,6 +17,8 @@ import { Marketplace } from '@/pages/public/Marketplace'
 import { ProductDetail } from '@/pages/public/ProductDetail'
 import { Vendors, VendorProfile } from '@/pages/public/Vendors'
 import { About, Contact } from '@/pages/public/StaticPages'
+import { EcoGuide } from '@/pages/ecoguide/EcoGuide'
+import { LearnArticle } from '@/pages/ecoguide/LearnArticle'
 
 // Auth pages
 import { SignIn, SignUp } from '@/pages/auth/Auth'
@@ -66,6 +68,8 @@ export default function App() {
               <Route path="vendors/:id" element={<VendorProfile />} />
               <Route path="about" element={<About />} />
               <Route path="contact" element={<Contact />} />
+              <Route path="ecoguide" element={<EcoGuide />} />
+              <Route path="ecoguide/learn/:slug" element={<LearnArticle />} />
             </Route>
 
             {/* ---- Auth routes (no layout wrapper) ---- */}

@@ -111,3 +111,16 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 ```bash
 npm run dev
 ```
+
+## Database migrations
+
+Schema lives in `supabase/migrations/`, applied in numeric order via the Supabase SQL Editor.
+
+| File | What |
+|---|---|
+| `000_baseline.sql` | Production schema snapshot (2026-11-26). Use to build a **fresh** environment — do not run on production. |
+| `003_…` and later | Incremental changes — run each once on every environment. |
+
+Rules: never edit a migration that has run in production — add a new one. Make migrations idempotent
+(`if not exists`, `create or replace`, `drop … if exists`) so a re-run is harmless.
+`schema.sql` in the root is superseded and kept for history only.

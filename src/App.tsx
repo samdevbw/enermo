@@ -20,6 +20,7 @@ import { About, Contact } from '@/pages/public/StaticPages'
 
 // Auth pages
 import { SignIn, SignUp } from '@/pages/auth/Auth'
+import { AuthCallback } from '@/pages/auth/AuthCallback'
 
 // Vendor pages
 import {
@@ -67,6 +68,7 @@ export default function App() {
             {/* ---- Auth routes (no layout wrapper) ---- */}
             <Route path="signin" element={<SignIn />} />
             <Route path="signup" element={<SignUp />} />
+            <Route path="auth/callback" element={<AuthCallback />} />
 
             {/* ---- Customer routes ---- */}
             <Route element={<AuthGuard />}>

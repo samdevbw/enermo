@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { SlidersHorizontal } from 'lucide-react'
 import { useProducts, useCategories } from '@/hooks/useProducts'
@@ -18,14 +18,25 @@ const DEFAULT_FILTERS: FilterState = {
 
 export function Marketplace() {
   const [searchParams] = useSearchParams()
-  const [filters, setFilters] = useState<FilterState>({
-    ...DEFAULT_FILTERS,
-    category: searchParams.get('category') ?? '',
-  })
+  const categoryParam = searchParams.get('category') ?? ''
+  const [filters, setFilters] = useState<FilterState>({ ...DEFAULT_FILTERS, category: categoryParam })
   const [filtersOpen, setFiltersOpen] = useState(false)
-
-  const { data: products = [], isLoading, isError } = useProducts(filters)
   const { data: categories = [] } = useCategories()
+
+  // Clicking another category link while already on /marketplace changes only
+  // the query string — the component stays mounted, so sync it into state.
+  useEffect(() => {
+    setFilters((prev) => (prev.category === categoryParam ? prev : { ...prev, category: categoryParam }))
+  }, [categoryParam])
+
+  // Footer links use slugs; the filters dropdown uses ids. Normalise to the id
+  // once categories load so the dropdown shows the right selection.
+  const resolvedFilters = useMemo<FilterState>(() => {
+    const match = categories.find((c) => c.slug === filters.category)
+    return match ? { ...filters, category: match.id } : filters
+  }, [filters, categories])
+
+  const { data: products = [], isLoading, isError } = useProducts(resolvedFilters)
 
   const handleFilterChange = useCallback((key: keyof FilterState, value: string | boolean) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
@@ -58,7 +69,7 @@ export function Marketplace() {
           )}
           <div className={`${filtersOpen ? 'fixed bottom-0 left-0 right-0 z-30 rounded-t-2xl md:static md:rounded-none' : ''} md:sticky md:top-20`}>
             <ProductFilters
-              filters={filters}
+              filters={resolvedFilters}
               categories={categories}
               onFilterChange={handleFilterChange}
               onReset={handleReset}

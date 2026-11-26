@@ -13,20 +13,28 @@ export async function fetchCategories(): Promise<Category[]> {
   return data as Category[]
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function fetchProducts(filters?: Partial<FilterState>): Promise<Product[]> {
+  const bySlug = !!filters?.category && !UUID_RE.test(filters.category)
   let query = supabase
     .from('products')
     .select(`
       *,
       vendor:vendors(*),
-      category:categories(*),
+      category:categories${bySlug ? '!inner' : ''}(*),
       product_images(*)
     `)
     .eq('status', 'published')
     .order('created_at', { ascending: false })
 
   if (filters?.category) {
-    query = query.eq('category_id', filters.category)
+    // Links can carry either a category id (filters dropdown, home page) or a
+    // slug (?category=batteries in the footer). Comparing a slug to the uuid
+    // column makes Postgres throw, which showed "Failed to load products".
+    query = UUID_RE.test(filters.category)
+      ? query.eq('category_id', filters.category)
+      : query.eq('category.slug', filters.category)
   }
 
   if (filters?.search) {
